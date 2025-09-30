@@ -8,7 +8,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 class Program
 {
 
-
+    enum Level
+    {
+        Title = 0,
+        Intro, 
+        _01,
+        _02
+    }
 
     public static void Main(string[] args)
     {
@@ -32,14 +38,17 @@ class Program
         bool newGame = false;
         string Answer = "";
         int DaylyMoney = 0;
+        Level currentLevel = Level.Title;
 
         // game starts here
-        user.PlayerName = PlayerInput("What is your name: ");
+
+        Console.ResetColor();
 
         WelcomeScreen();
 
         if (newGame == true) // if starting a new game run through the intro and levels
         {
+
             IntroScene();
 
             Level01();
@@ -56,10 +65,12 @@ class Program
 
         void WelcomeScreen() // Infomation about how to play and Level selection
         {
-            ScrollText("Type 'help' to see game comands");
-            ScrollText("Welcome to the game");
+            user.PlayerName = PlayerInput("What is your name: ");
 
-            Answer = choice("What level do you want to start at? \n1. Start New Game \n2. Level 1\n Level 2", 3);
+            ScrollText("Type 'help' to see game comands\n");
+            ScrollText(CentrePad("Welcome to Bog Dewller", 2));
+
+            Answer = choice("What level do you want to start at? \n1. Start New Game \n2. Level 1\n3. Level 2", 3);
             switch (Answer)
             {
                 case "1":
@@ -81,14 +92,15 @@ class Program
 
         void IntroScene()
         {
-
+            currentLevel = Level.Intro;
             Console.Clear();
             ScrollText($"Welcome! {user.PlayerName}");
+
             //show image
             AsciiImage("Village");
-            // shows strings with a wait after 
-            ScrollText("This is the great town of !");
 
+            // shows strings with a wait after 
+            ScrollText("This is the great town of ");
             ScrollText("You don't know yet..");
 
             Continue();
@@ -102,6 +114,8 @@ class Program
 
         void Level01()
         {
+            currentLevel = Level._01;
+
             Console.Clear();
 
             ScrollText("You flee into the city running as fast as your legs will take you");
@@ -164,6 +178,9 @@ class Program
 
         void Level02()
         {
+
+            currentLevel = Level._02;
+            
             Console.Clear();
             ScrollText("Today is a new day and you sleept... ");
             ScrollText("well you slept so thats all that counts right?");
@@ -274,7 +291,6 @@ class Program
 
         void NewDay() // method for starting a new day 
         {
-            Console.Clear();
             ScrollText("A new day begins, your health is restored");
             user.PlayerHealth = 10;
             user.PlayerGold += DaylyMoney;
@@ -284,6 +300,8 @@ class Program
         void DescribeRoom(Room room) // describes the room the player is in 
         {
             ScrollText($"\nYou are now in the {room.Name}.\n{room.Description}\n");
+
+            AsciiImage("ShopSign");
 
             Console.WriteLine(@"
     Room Exits: {0}{1}{2}{3}",
@@ -300,6 +318,7 @@ class Program
 
             ScrollText(CentrePad(PlayerText, 4));
             ScrollText($"Your name is {user.PlayerName}");
+            ScrollText($"You are on Level {currentLevel} \n");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ScrollText($"You have {user.PlayerHealth}HP left.");
@@ -312,7 +331,7 @@ class Program
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             ScrollText($"You have {user.PlayerGold} Gold");
-            ScrollText($"You get {DaylyMoney} everyday");
+            ScrollText($"You get {DaylyMoney}Gold everyday");
             Console.ResetColor();
 
             ScrollText(CentrePad("------------", 4));
@@ -327,8 +346,7 @@ class Program
 
         void Continue() // fast way of waiting for the user to input before clearing the screen 
         {
-            ScrollText("Press enter to Conintue");
-            Console.ReadLine();
+            PlayerInput("Press enter to Conintue");
             Console.Clear();
         }
 
@@ -355,19 +373,41 @@ class Program
 
         bool RollStats(int PlayerStat, int EnemyStat, string Type) // use when Comparing stats from something to see if it is sucessful
         {
-            int RanNum = RandomNumber(0, EnemyStat);
-            ScrollText($"You used {Type} \nYour {Type} Level is {PlayerStat} \nThey have a perception of {RanNum}");
+            int RanNum = RandomNumber(0, EnemyStat + 1);
+
+            ScrollText(CentrePad("Roll your stats", 3));
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            ScrollText($"\nYou used {Type}");
+            ScrollText($"Your {Type} Level is {PlayerStat}");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            ScrollText($"They have a Level of {RanNum}");
+            for(int i = 0; i < 3; i++)
+            {
+                Thread.Sleep(500);
+                Console.Write(".");
+            }
 
             if (PlayerStat >= RanNum)
             {
-                ScrollText("You Won Roll");
+                Console.ForegroundColor = ConsoleColor.Green;
+                ScrollText("You Won Roll\n");
+                Console.ResetColor();
+                ScrollText(CentrePad("---------------", 3));
                 return true;
             }
             else
             {
-                ScrollText("You lost the roll");
+                Console.ForegroundColor = ConsoleColor.Red;
+                ScrollText("You lost the roll\n");
+                Console.ResetColor();
+                ScrollText(CentrePad("---------------", 3));
                 return false;
             }
+
+            Console.ResetColor();
+            ScrollText(CentrePad("---------------", 3));
+
         }
 
         void ScrollText(string text) // scrolls through text giving it a nice animation
@@ -400,7 +440,7 @@ class Program
                 }
                 catch
                 {
-                    Console.Write("Input a number e.g. 2");
+                    Console.Write("Input a number\n");
                 }
 
             } while (Answer < 0 || Answer > Max);
@@ -446,7 +486,7 @@ class Program
                         ChangeRoom();
                         break;
                     case "help":
-                        ScrollText("Type 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Exit' to exit the game");
+                        ScrollText("Type 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Exit' to exit the game\n");
                         break;
                 }
 
@@ -475,6 +515,21 @@ __/_  /   \ ______/ ''   /'\_,__
 '  |[]|,.--'' '',   ''-,.    |
   ..    ..-''    ;       ''. '");
 
+                    break;
+
+                case "ShopSign":
+                    Console.WriteLine(@"                       
+                   +##############################################################* 
+               ##############*##################################################### 
+            ###########+         =####=-      :##@@   ...--==@#@. ..  @@#|  ####### 
+        ############%-    ####%@   #@@   *@@@   -@@=  :#*#####@#  @*   .@| ####### 
+     *#############@=  @@==####%*   @@   ##%@%  #@%   ---...##@#  %@@   .| ####### 
+  *##############@@%   @+@'####@@  *@@:         #@@*  +#######@#  ##@@     ####### 
+ *################@@:  -@@:@.*#%@  ##@#   +%#####@@*  #######%@#  *##@@%   ######+ 
+    ###############@@   +######@  ##%@%   #######@@         +%@@@@#####@@@@%#####- 
+       %############@@@         *###@@-   ######@@@@@@@@@@@######################= 
+           ##########%@@@@@@@@@%####@@@@@#######@%##########%@@@%%###############  
+              ###################################################################");
                     break;
 
                 case "Homeless":

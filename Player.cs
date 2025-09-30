@@ -26,9 +26,10 @@ public class Player
     public int StatIncrease(int Stat, string StatType) // display and increase stats 
     {
         Stat += 1;
+        Console.ForegroundColor = ConsoleColor.Blue;
         ScrollText($"Your {StatType} has increased by 1 Level");
         ScrollText($"You are now on {StatType} level: {Stat}");
-
+        Console.ResetColor();
         return Stat;
     }
 
