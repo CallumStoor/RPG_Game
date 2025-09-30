@@ -4,5 +4,37 @@ class Room
 {
     public string Name;
     public string Description;
+    public string FirstVisitDescription;
     public int EnergyUsed = 0;
+
+    public bool isVisited = false;
+
+    public Room NorthDoor;
+    public Room SouthDoor;
+    public Room EastDoor;
+    public Room WestDoor;
+
+    public Room(string name, string description, string firstVisit)
+    {
+        Name = name;
+        Description = description;
+        FirstVisitDescription = firstVisit;
+    }
+
+    public void Visit()
+    {
+        if (!isVisited)
+        {
+            Console.WriteLine($"\nYou enter the {Name} for the first time.\n{Description}\n");
+            Console.WriteLine(FirstVisitDescription);
+            isVisited = true;
+        }
+        else
+        {
+            Console.WriteLine($"You are in the {Name}");
+            Console.WriteLine("Nothing new to see here");
+        }
+    }
+
+
 }

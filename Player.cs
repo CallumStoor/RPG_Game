@@ -9,9 +9,10 @@ public class Player
     public int PlayerIntimidation = 1;
     public int PlayerCharisma = 1;
     public int PlayerSneak = 1;
-    public string PlayerName;
+    public int PlayerGold = 1;
+    public string PlayerName = "Dweller";
 
-    public Player(string playerName, int playerHealth, int playerIntellegence, int playerIntimidaton, int playerCharisma, int playerSneak)
+    public Player(string playerName, int playerHealth, int playerIntellegence, int playerIntimidaton, int playerCharisma, int playerSneak, int playerGold)
     {
         PlayerName = playerName;
         PlayerHealth = playerHealth;
@@ -19,7 +20,7 @@ public class Player
         PlayerIntellegence = playerIntellegence;
         PlayerIntimidation = playerIntimidaton;
         PlayerSneak = playerSneak;
-
+        PlayerGold = playerGold;
     }
 
     public int StatIncrease(int Stat, string StatType) // display and increase stats 

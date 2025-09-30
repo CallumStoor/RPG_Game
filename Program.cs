@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 using System.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 class Program
 {
@@ -12,17 +13,39 @@ class Program
     public static void Main(string[] args)
     {
         // starting stats of the player at the begining of the game
-        Player user = new Player("", 10, 1, 1, 1, 1);
+        Player user = new Player("", 10, 1, 1, 1, 1, 0);
 
+        // rooms in the game
+        Room street = new Room("Street", "You are standing on a busy street, it smells and everyone is moving past you with somewhere to go.", "The people look at you with disgust");
+        Room shop = new Room("Shop", "You are in a small shop, there is a shopkeep behind the counter eyeing you suspiciously", "You enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.");
+        
+        // current room the player is in
+        Room currentRoom = street;
+
+        // linking rooms together
+        street.NorthDoor = shop;
+
+        shop.SouthDoor = street;
+
+        // game variables
         bool isAlive = true;
+        bool newGame = false;
+        string Answer = "";
+        int DaylyMoney = 0;
 
+        // game starts here
         user.PlayerName = PlayerInput("What is your name: ");
 
         WelcomeScreen();
 
-        IntroScene();
+        if (newGame == true) // if starting a new game run through the intro and levels
+        {
+            IntroScene();
 
-        Level01();
+            Level01();
+
+            Level02();       
+        }
 
         AliveCheck(); // just in case
 
@@ -31,10 +54,36 @@ class Program
 
 
 
-        void WelcomeScreen()
+        void WelcomeScreen() // Infomation about how to play and Level selection
         {
+            ScrollText("Type 'help' to see game comands");
+            ScrollText("Welcome to the game");
+
+            Answer = choice("What level do you want to start at? \n1. Start New Game \n2. Level 1\n Level 2", 3);
+            switch (Answer)
+            {
+                case "1":
+                    ScrollText("Starting New Game");
+                    newGame = true;
+                    break;
+                case "2":
+                    ScrollText("Starting at Level 1");
+                    Level01();
+                    break;
+                case "3":
+                    ScrollText("Starting at Level 2");
+                    Level02();
+                    break;
+            }
+
+
+        }
+
+        void IntroScene()
+        {
+
             Console.Clear();
-            Console.WriteLine($"Welcome! {user.PlayerName}");
+            ScrollText($"Welcome! {user.PlayerName}");
             //show image
             AsciiImage("Village");
             // shows strings with a wait after 
@@ -42,19 +91,12 @@ class Program
 
             ScrollText("You don't know yet..");
 
-            ScrollText("Anyway, press anything to start");
-            Console.ReadKey(true);
-            Thread.Sleep(2000);
-        }
-
-        void IntroScene()
-        {
+            Continue();
 
             Console.Clear();
             Console.WriteLine("Intro to game here");
 
-            Console.WriteLine("press a key to continue");
-            Console.ReadKey(true);
+            Continue();
 
         }
 
@@ -66,7 +108,7 @@ class Program
             ScrollText("No looking back now.");
             ScrollText("What will you do?");
 
-            string Answer = choice("1. Continue to run away\n2. Hide in the crowds of people (Sneak)", 2);
+            Answer = choice("1. Continue to run away\n2. Hide in the crowds of people (Sneak)", 2);
 
             switch (Answer)
             {
@@ -77,7 +119,7 @@ class Program
                 case "2":
                     if (RollStats(user.PlayerSneak, 1, "Sneak") == true)
 
-                        ScrollText("You stand as still as possible only moving slightly to hide your face behind people");
+                    ScrollText("You stand as still as possible only moving slightly to hide your face behind people");
                     ScrollText("You make direct eye contact with him, but luckily he doesn't notice you");
 
                     user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
@@ -98,7 +140,8 @@ class Program
             switch (Answer)
             {
                 case "1":
-                    ScrollText("\nYou enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.");
+                    currentRoom = shop;
+                    currentRoom.Visit();
                     break;
                 case "2":
                     ScrollText("\n You walk up to the first normal-ish looking person you can find and chat with them \n they don't reply much but you make them smile a small amount\n you realise it has gotten late.");
@@ -108,18 +151,150 @@ class Program
                     ScrollText("\nYou walk over too a food stand and wait until it gets busy, then try to steal a loaf of bread");
                     RollStats(user.PlayerSneak, 4, "Sneak");
                     ScrollText("The Shopkeep shouts at you and goes to call over the law enforcemnt.. \nYou need to run\n Running through crowds of people makes you tired and once you get away they leave.");
+                    user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
                     break;
             }
 
-
             ScrollText("Your poor and have to sleep on the street tonight");
-
+            currentRoom = street;
 
             Continue();
 
         }
 
-        void ShowStats()
+        void Level02()
+        {
+            Console.Clear();
+            ScrollText("Today is a new day and you sleept... ");
+            ScrollText("well you slept so thats all that counts right?");
+            NewDay();
+
+
+            ScrollText("Where will you go now?");
+
+            Answer = choice("1. Go to the shop \n2. Try to find a job (charisma) \n3. Try to steal something (sneak)", 3);
+
+            switch(Answer)
+            {
+                case "1":
+                    currentRoom = shop;
+                    DescribeRoom(currentRoom);
+                    break;
+                case "2":
+                    ScrollText("You try to find a job");
+                    if (RollStats(user.PlayerCharisma, 3, "Charisma"))
+                    {
+                        ScrollText("You got a job!");
+                        user.PlayerCharisma = user.StatIncrease(user.PlayerCharisma, "Charisma");
+                        ScrollText("You get 5 gold a day now");
+                        DaylyMoney = 5;
+                    }
+                    else
+                    {
+                        ScrollText("You didn't get the job");
+                    }
+                    break;
+                case "3":
+                    ScrollText("You try to steal something");
+                    if (RollStats(user.PlayerSneak, 4, "Sneak"))
+                    {
+                        ScrollText("You got away with it!");
+                        user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
+                        ScrollText("You found 3 gold");
+                        user.PlayerGold += 3;
+                    }
+                    else
+                    {
+                        ScrollText("You got caught and hurt in the process");
+                        user.PlayerHealth -= 3;
+                        AliveCheck();
+                    }
+
+                    break;
+            }
+
+            Continue();
+        }
+
+        //method to change rooms
+        string ChangeRoom()
+        {
+            currentRoom = street; // starting room 
+            DescribeRoom(currentRoom);
+            string Answer = choice("Where do you want to go?", 4);
+            switch (Answer)
+            {
+                case "1":
+                    if (currentRoom.NorthDoor != null)
+                    {
+                        currentRoom = currentRoom.NorthDoor;
+                        currentRoom.Visit();
+                    }
+                    else
+                    {
+                        ScrollText("There is no door that way");
+                    }
+                    break;
+                case "2":
+                    if (currentRoom.SouthDoor != null)
+                    {
+                        currentRoom = currentRoom.SouthDoor;
+                        DescribeRoom(currentRoom);
+                    }
+                    else
+                    {
+                        ScrollText("There is no door that way");
+                    }
+                    break;
+                case "3":
+                    if (currentRoom.EastDoor != null)
+                    {
+                        currentRoom = currentRoom.EastDoor;
+                        DescribeRoom(currentRoom);
+                    }
+                    else
+                    {
+                        ScrollText("There is no door that way");
+                    }
+                    break;
+                case "4":
+                    if (currentRoom.WestDoor != null)
+                    {
+                        currentRoom = currentRoom.WestDoor;
+                        DescribeRoom(currentRoom);
+                    }
+                    else
+                    {
+                        ScrollText("There is no door that way");
+                    }
+                    break;
+            }
+            return currentRoom.Name;
+        }
+
+        void NewDay() // method for starting a new day 
+        {
+            Console.Clear();
+            ScrollText("A new day begins, your health is restored");
+            user.PlayerHealth = 10;
+            user.PlayerGold += DaylyMoney;
+            ShowStats();
+        }
+
+        void DescribeRoom(Room room) // describes the room the player is in 
+        {
+            ScrollText($"\nYou are now in the {room.Name}.\n{room.Description}\n");
+
+            Console.WriteLine(@"
+    Room Exits: {0}{1}{2}{3}",
+            room.NorthDoor == null ? "" : "1. North",
+            room.SouthDoor == null ? "" : "2. South",
+            room.EastDoor == null ? "" : "3. East",
+            room.WestDoor == null ? "" : "4. West"
+            );
+        }
+
+        void ShowStats() // shows the players stats when called
         {
             string PlayerText = "Player Stats";
 
@@ -134,6 +309,10 @@ class Program
             ScrollText($"Intellegence level: {user.PlayerIntellegence}");
             ScrollText($"Charisma level: {user.PlayerCharisma}");
             ScrollText($"Intimidation level: {user.PlayerIntimidation}");
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            ScrollText($"You have {user.PlayerGold} Gold");
+            ScrollText($"You get {DaylyMoney} everyday");
             Console.ResetColor();
 
             ScrollText(CentrePad("------------", 4));
@@ -252,12 +431,23 @@ class Program
                     Console.WriteLine("Unexpected Value");
                 }
 
-                if (input.Trim().ToLower() == "showstat")
+                switch(input.Trim().ToLower())
                 {
-                    ShowStats();
-                    isEntered = false;
-
-                    ScrollText("Input answer to question");
+                    case "exit":
+                        Environment.Exit(0);
+                        break;
+                    case "clear":
+                        Console.Clear();
+                        break;
+                    case "showstats":
+                        ShowStats();
+                        break;
+                    case "room":
+                        ChangeRoom();
+                        break;
+                    case "help":
+                        ScrollText("Type 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Exit' to exit the game");
+                        break;
                 }
 
             } while (isEntered == false || input == null);
