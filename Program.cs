@@ -60,9 +60,6 @@ class Program
 
         Console.ReadLine();
 
-
-
-
         void WelcomeScreen() // Infomation about how to play and Level selection
         {
             user.PlayerName = PlayerInput("What is your name: ");
