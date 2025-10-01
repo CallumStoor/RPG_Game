@@ -5,6 +5,7 @@ class Room
     public string Name;
     public string Description;
     public string FirstVisitDescription;
+    public string AsciiText;
     public int EnergyUsed = 0;
 
     public bool isVisited = false;
@@ -14,11 +15,13 @@ class Room
     public Room EastDoor;
     public Room WestDoor;
 
-    public Room(string name, string description, string firstVisit)
+    public Room(string name, string description, string firstVisit, string asciiText)
     {
         Name = name;
         Description = description;
         FirstVisitDescription = firstVisit;
+        AsciiText = asciiText;
+        
     }
 
     public void Visit()

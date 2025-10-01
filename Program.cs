@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RPG_Game;
+using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Text;
@@ -21,9 +22,18 @@ class Program
         // starting stats of the player at the begining of the game
         Player user = new Player("", 10, 1, 1, 1, 1, 0);
 
+        AsciiPictures AsciiImage = new AsciiPictures();
+
         // rooms in the game
-        Room street = new Room("Street", "You are standing on a busy street, it smells and everyone is moving past you with somewhere to go.", "The people look at you with disgust");
-        Room shop = new Room("Shop", "You are in a small shop, there is a shopkeep behind the counter eyeing you suspiciously", "You enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.");
+        Room street = new Room("Street",
+            "You are standing on a busy street, it smells and everyone is moving past you with somewhere to go.",
+            "The people look at you with disgust",
+            AsciiImage.AsciiDisplay(""));
+
+        Room shop = new Room("Shop",
+            "You are in a small shop, there is a shopkeep behind the counter eyeing you suspiciously",
+            "You enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.",
+            AsciiImage.AsciiDisplay("ShopSign"));
         
         // current room the player is in
         Room currentRoom = street;
@@ -94,7 +104,7 @@ class Program
             ScrollText($"Welcome! {user.PlayerName}");
 
             //show image
-            AsciiImage("Village");
+            Console.WriteLine(AsciiImage.AsciiDisplay("Village"));
 
             // shows strings with a wait after 
             ScrollText("This is the great town of ");
@@ -161,7 +171,8 @@ class Program
                 case "3":
                     ScrollText("\nYou walk over too a food stand and wait until it gets busy, then try to steal a loaf of bread");
                     RollStats(user.PlayerSneak, 4, "Sneak");
-                    ScrollText("The Shopkeep shouts at you and goes to call over the law enforcemnt.. \nYou need to run\n Running through crowds of people makes you tired and once you get away they leave.");
+                    ScrollText("The Shopkeep shouts at you and goes to call over the law enforcemnt.. \nYou need to run\n Running through crowds of people makes you tired and once you get away they leave. \nYou lose 3 health for that");
+                    user.PlayerHealth -= 3;
                     user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
                     break;
             }
@@ -298,7 +309,7 @@ class Program
         {
             ScrollText($"\nYou are now in the {room.Name}.\n{room.Description}\n");
 
-            AsciiImage("ShopSign");
+            Console.WriteLine(AsciiImage.AsciiDisplay("ShopSign"));
 
             Console.WriteLine(@"
     Room Exits: {0}{1}{2}{3}",
@@ -311,10 +322,10 @@ class Program
 
         void ShowStats() // shows the players stats when called
         {
-            string PlayerText = "Player Stats";
+            string PlayerText = $"{user.PlayerName} Stats";
 
             ScrollText(CentrePad(PlayerText, 4));
-            ScrollText($"Your name is {user.PlayerName}");
+            ScrollText(CentrePad($"Level {currentLevel}", 1));
             ScrollText($"You are on Level {currentLevel} \n");
 
             Console.ForegroundColor = ConsoleColor.Green;
@@ -379,10 +390,11 @@ class Program
             ScrollText($"Your {Type} Level is {PlayerStat}");
             Console.ForegroundColor = ConsoleColor.DarkRed;
             ScrollText($"They have a Level of {RanNum}");
+            Console.ForegroundColor = ConsoleColor.Yellow;
             for(int i = 0; i < 3; i++)
             {
                 Thread.Sleep(500);
-                Console.Write(".");
+                Console.Write(" .");
             }
 
             if (PlayerStat >= RanNum)
@@ -401,9 +413,6 @@ class Program
                 ScrollText(CentrePad("---------------", 3));
                 return false;
             }
-
-            Console.ResetColor();
-            ScrollText(CentrePad("---------------", 3));
 
         }
 
@@ -491,92 +500,6 @@ class Program
 
             return input;
 
-        }
-
-        void AsciiImage(string imageName) // method for containing images 
-        {
-
-            switch (imageName)
-            {
-                case "Village":
-                    Console.WriteLine(@"
-  ~         ~~          __
-       _T      .,,.    ~--~ ^^
- ^^   // \                    ~
-      ][O]    ^^      ,-~ ~
-   /''-I_I         _II____
-__/_  /   \ ______/ ''   /'\_,__
-  | II--'''' \,--:--..,_/,.-{ },
-; '/__\,.--';|   |[] .-.| O{ _ }
-:' |  | []  -|   ''--:.;[,.'\,/
-'  |[]|,.--'' '',   ''-,.    |
-  ..    ..-''    ;       ''. '");
-
-                    break;
-
-                case "ShopSign":
-                    Console.WriteLine(@"                       
-                   +##############################################################* 
-               ##############*##################################################### 
-            ###########+         =####=-      :##@@   ...--==@#@. ..  @@#|  ####### 
-        ############%-    ####%@   #@@   *@@@   -@@=  :#*#####@#  @*   .@| ####### 
-     *#############@=  @@==####%*   @@   ##%@%  #@%   ---...##@#  %@@   .| ####### 
-  *##############@@%   @+@'####@@  *@@:         #@@*  +#######@#  ##@@     ####### 
- *################@@:  -@@:@.*#%@  ##@#   +%#####@@*  #######%@#  *##@@%   ######+ 
-    ###############@@   +######@  ##%@%   #######@@         +%@@@@#####@@@@%#####- 
-       %############@@@         *###@@-   ######@@@@@@@@@@@######################= 
-           ##########%@@@@@@@@@%####@@@@@#######@%##########%@@@%%###############  
-              ###################################################################");
-                    break;
-
-                case "Homeless":
-                    Console.WriteLine(@"
-▓▓▓▓▓▒▒▒▒▒▒▒▓▒▓▓▓▓▓▓██▒▒▓▒▒▓▓▓▓▓▓▓▓▒▓
-▒▓▓▓▓▒▒▒▒▒▒▒▒▓▓██▓▓▓███▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▒▓▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓███▓▓▓▓▓▓▓▓▒▒▓▓▒▒
-▒▒▒▓▓▒▒▒▒▒▒▒▒▒▒▓▓███▓███▓▒▓▒▒▒▒▒▓▒▒▒▒
-▒▒▓▒▒▒▒▒▒▒▒▒▒▓▓██████████▓▓▓▒▒▒▓▓▒▒▒▒
-▒▒▒▒▒▓▒▓▒▒▒▒▓▓▓▓▓▓▓████▓█▓▓▓█▒▒▒▒▒▒▒▒
-▒▒▒▒▒▒▒▓▒▒▒▓▓▓▓█▓▓████▓██▓█▓██▓▒▒▒▓▒▒
-▒▒▒▒▒▒▒▓▒▒▓██▓▓█▓▓▓███▓▓█▓█▒▓██▓▒▒▒▒▒
-▒▒▒▒▒▒▒▒▒▓▓█▓▓█▓█▓▓█▓▓▓█▓▓█▓███▓▓▓▓▒▒
-▒▒▒▒▒▒▒▒▓▓█▓██▓█▓▓█▒▓█▓█▓▓█▓███▓▒▓▓▒▓
-▒▒▒▒▒▒▒▓▓▓▓▓▓▓████▓▓▓█▓█▓▓█▓▓██▓▒▒▒▒▒
-▒▒▒▒▒▒▓▓▓█▓█▓▓███▓▓▒█▓██▓▒▓▓▓██▓▒▒▒▒▓
-▒▒▒▒▓▓▒▓███▓▒▒▓▓▓▓▓▒█▓▓▓▓▓▓▓▓███▓▓▒▒▓
-▒▒▒▓▓▓▓▓▓▒▓▓▒▒▒▒▓█▒▓█▓▓▓█▓█▓▓███▒▒▒▒▓
-▒▒▒▓▒▓▓▒▒▓▓▓▒▓▒▒██▒█▓████▓██▓▓█▓▓▓▒▒▒
-▒▒▒▓▓█▓▒███▓▓▓▓██████████▓█▓▓▓█▓▓▓▒▒▒
-▒▒▒▓▓▓▒▒█▓▒▒▓████████▓███▓▓▓▒▓█▓▓▓▒▒▒
-▒▒▒▒▓▒▒▒▒▒▓██████████▓███▓█▓▓█▓█▓▒▒▒▒
-▒▒▒▒▒▓▓▓▓▓██▒▓▓██████▓████▓█████▒▓▒▒▒
-▒▒▒▒▒▒▒▒▒▒█▒▓▓▓████████▓█▓█▓▓██▓▒▓▓▒▒
-▒▒▒▒▒▒▒▒▒▒▓▒▓▓█▓▓███▓██▓▓██▓▓███▒▒▒▒▒
-▒▒▒▒▒▒▒▒▒▒▓▒▓▓▒▒█▓▓▓▓█▓▓▓██▒▓▓▓█▒▒▓▒▒
-▒▒▒▒▒▒▒▒▓▓▒▓▓▒▓██▓█▓██▓▓▒█▓▒▓▓▓█▓▒▒▓▒
-▒▓▒▒▒▒▒▒▒▓▒▓▓▓██▓█▓▓▓▓▓▓▓█▓▓▓▓▒█▓▓▒▒▒
-▓▓▒▒▒▒▒▒▒▓▓▓▓▓▓███▓▒▒▒▓▓▓█▒▒█▓▒▓▓▒▒▒▒
-▓▓▓▓▓▓▓▓▓▓███▒▓███▓▒▒▒█▓▓█▒▒████▓▒▒▒▒
-▓▓▓▓▓▓▓▓▓█▓▓▓▒█████▒▒▒█▒█▓▓▓█▓██▒▒▒▒▒
-▓▓▒▒▓▓▓▓▓▓▓▓▓▓█████▒▒▓▓▒▓▓▒▓▓▒▓█▒▒▒▒▒
-▒▒▒▒▒▒▒▒▓▓▓█▓▓██████▒▒▒▒█▓▓█████▒▒▒▒▒
-▒▒▒▒▒▒▒▒████▓▓█████▓▓███▓▓█████▒▒▒▒▒▒
-▒▒▒▒▒▒▒▒▒▒▓██▓█████████████████▒▓▒▒▒▒
-▒▒▒▒▒▒▒▒▓▓▓▓▒▓███▓▒▒▓▓████████▒▒▒▓▒▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▓▒▓▓▓▓▓▒▓▒▒███▒▓▓▒▒▒▒▓▒▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▓▓▓█▒▒▓█▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓██▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▒▒▒▒▒▒▒▒▒█▓▓███▒▒▓█▓██▓▒▒▒▒▒▒▒▒▒▒▒▒
-▒▓▓▓▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓▓▓
-▒▓▓▓▒▒▒▒▓▓▓▓▓███████▓▓▓██████████▓███
-▓▒▓▒▒▓▓▓▒▒▓▓██████▓█▓▓▓▓██▓▓▓▓▓▓████▓
-▒▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▒▒▒▒▒▓▓▓▓▓▓
-▒▒▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▒▓▓▓▓▒▒▒
-");
-
-                    break;
-
-            }
         }
 
     }
