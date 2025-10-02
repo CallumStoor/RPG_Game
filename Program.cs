@@ -12,7 +12,7 @@ class Program
     enum Level
     {
         Title = 0,
-        Intro, 
+        Intro,
         _01,
         _02
     }
@@ -34,7 +34,7 @@ class Program
             "You are in a small shop, there is a shopkeep behind the counter eyeing you suspiciously",
             "You enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.",
             AsciiImage.AsciiDisplay("ShopSign"));
-        
+
         // current room the player is in
         Room currentRoom = street;
 
@@ -63,7 +63,7 @@ class Program
 
             Level01();
 
-            Level02();       
+            Level02();
         }
 
         AliveCheck(); // just in case
@@ -116,8 +116,8 @@ class Program
             ScrollText("In the bustling town of dercher, The dracones are hot on your tail and it's your fault. jumping into a wagon stationed near-by the wagon then darts off as fast as it can weaving between people and Dracone members");
             Console.WriteLine();
             Thread.Sleep(300);
-            ScrollText($"Hey {user.PlayerName} what the hell, you said you would be long gone before you got in here \nIt's fine they don't even know who you are. \nDid you foget who we are talking about, even if they couldn't easily find out i would have to change my wagon before they get a full profile on it. every single detail! \nWell we got away didn't we? \nNo thanks to you \n Oh just drop it already. ");
-            
+            ScrollText($"Hey {user.PlayerName} what the hell, you said they would be long gone before you got here \n\nIt's fine they don't even know who you are. \n\nDid you foget who we are talking about, even if they couldn't easily find out I would have to change my wagon before they get a full profile on it. every single detail! \n\nWell we got away didn't we? \nNo thanks to you \n\nOh just drop it already. ");
+
             Continue();
 
             ScrollText(CentrePad("A few hours later", 4));
@@ -147,7 +147,7 @@ class Program
                 case "2":
                     if (RollStats(user.PlayerSneak, 1, "Sneak") == true)
 
-                    ScrollText("You stand as still as possible only moving slightly to hide your face behind people");
+                        ScrollText("You stand as still as possible only moving slightly to hide your face behind people");
                     ScrollText("You make direct eye contact with him, but luckily he doesn't notice you");
 
                     user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
@@ -195,7 +195,7 @@ class Program
         {
 
             currentLevel = Level._02;
-            
+
             Console.Clear();
             ScrollText("Today is a new day and you sleept... ");
             ScrollText("well you slept so thats all that counts right?");
@@ -206,7 +206,7 @@ class Program
 
             Answer = choice("1. Go to the shop \n2. Try to find a job (charisma) \n3. Try to steal something (sneak)", 3);
 
-            switch(Answer)
+            switch (Answer)
             {
                 case "1":
                     currentRoom = shop;
@@ -361,7 +361,8 @@ class Program
 
         void Continue() // fast way of waiting for the user to input before clearing the screen 
         {
-            PlayerInput("Press enter to Conintue");
+            ScrollText("Press Enter To Continue");
+            Console.ReadLine();
             Console.Clear();
         }
 
@@ -398,7 +399,7 @@ class Program
             Console.ForegroundColor = ConsoleColor.DarkRed;
             ScrollText($"They have a Level of {RanNum}");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Thread.Sleep(500);
                 Console.Write(" .");
@@ -484,7 +485,7 @@ class Program
                     Console.WriteLine("Unexpected Value");
                 }
 
-                switch(input.Trim().ToLower())
+                switch (input.Trim().ToLower())
                 {
                     case "exit":
                         Environment.Exit(0);
