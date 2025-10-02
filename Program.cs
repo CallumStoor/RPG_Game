@@ -58,6 +58,7 @@ class Program
         bool newGame = false;
         string Answer = "";
         int DaylyMoney = 0;
+        int AvalibleTrade = 2;
         Level currentLevel = Level.Title;
 
         // Infomation List
@@ -77,6 +78,8 @@ class Program
         // game starts here
 
         Console.ResetColor();
+
+        currentLevel = Level.Title;
 
         WelcomeScreen();
 
@@ -98,7 +101,7 @@ class Program
         {
             user.PlayerName = PlayerInput("What is your name: ");
 
-            ScrollText("Type 'help' to see game comands\n");
+            ScrollText("Type 'help' to see game comands\nYou can Enter Commands any time you are prompted to input\n\n");
             ScrollText(CentrePad("Welcome to Swamp Dewller", 2));
 
             Answer = choice("What level do you want to start at? \n1. Start New Game \n2. Level 1\n3. Level 2", 3);
@@ -137,23 +140,28 @@ class Program
             Continue();
 
             Console.Clear();
-            ScrollText("In the bustling town of dercher, The dracones are hot on your tail and it's your fault. jumping into a wagon stationed near-by the wagon then darts off as fast as it can weaving between people and Dracone members");
+            ScrollTextSlow("In the bustling town of dercher, The dracones are hot on your tail and it's your fault. Jumping into a wagon stationed nearby the wagon then darts off as fast as it can weaving between people and Dracone members");
             Console.WriteLine();
             Thread.Sleep(300);
-            ScrollText($"Hey {user.PlayerName} what the hell, you said they would be long gone before you got here \n\nIt's fine they don't even know who you are. \n\nDid you foget who we are talking about, even if they couldn't easily find out I would have to change my wagon before they get a full profile on it. every single detail! \n\nWell we got away didn't we? \n\nNo thanks to you \n\nOh just drop it already. ");
-
+            ScrollTextSlow($"'Hey {user.PlayerName}..'");
+            ScrollTextSlow("'Yeah?'");
+            ScrollTextSlow("'What the hell! You said they would be long gone before you got here' \n\n'It's fine they don't even know who you are.' \n\n'Did you foget who we are talking about, even if they couldn't easily find out I would have to change my wagon before they get a full profile on it. every single detail!' \n\n'Well we got away didn't we?' \n\n'No thanks to you' \n\n'Oh just drop it already.' ");
+            ScrollTextSlow("'Why are you acting like this wasn't the worst mistake of your life?! At least he is dead now'");
+            ScrollTextSlow("'Yeah.. sure..'");
+            ScrollTextSlow($"The driver's eyes narrow and glance at {user.PlayerName} for a second\n");
             Continue();
 
-            ScrollText(CentrePad("A few hours later", 4));
+            ScrollTextSlow(CentrePad("A few hours later", 4));
             Console.WriteLine();
-            ScrollText("You have made it to the next town over and he stops the wagon\n\nHow about that payment, i know we agreed until we are long gone but after what you done back there i deserve something. \n");
+            ScrollTextSlow("'You have made it to the next town over and he stops the wagon'\n\n'How about that payment, i know we agreed until we are long gone but after what you done back there i deserve something.' \n");
             Thread.Sleep(500);
-            ScrollText("...");
+            ScrollTextSlow("...\n");
             Thread.Sleep(500);
-            ScrollText("Soo.. about that. I actually got to go, i know crazy right? anyawy. See ya!\n");
+            ScrollTextSlow("'So about that. I actually got to go, i know crazy right? Anyawy. See ya!'\n");
             Console.ForegroundColor = ConsoleColor.Red;
-            ScrollText("WHAT YOU CAN'T DO THAT, GET BACK HERE YOU BLITHERING BASTARD");
+            ScrollTextSlow("'WHAT YOU CAN'T DO THAT, GET BACK HERE YOU BLITHERING BASTARD!'\n");
             Console.ResetColor();
+            Thread.Sleep(200);
 
         }
 
@@ -178,8 +186,8 @@ class Program
                 case "2":
                     if (RollStats(user.PlayerSneak, 1, "Sneak") == true)
 
-                        ScrollText("You stand as still as possible only moving slightly to hide your face behind people");
-                    ScrollText("You make direct eye contact with him, but luckily he doesn't notice you");
+                    ScrollTextSlow("You stand as still as possible only moving slightly to hide your face behind people");
+                    ScrollTextSlow("You make direct eye contact with him, but luckily he doesn't notice you");
 
                     user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
                     break;
@@ -349,17 +357,24 @@ class Program
         void InfoShow()
         {
             ScrollText(CentrePad("Infomation Inventory", 3));
-            ScrollText("\nHere is all the infomation you know. You have a max of 4 that you can hold");
-            for (int i = 0; i < user.PlayerInfo.Length; i++)
+            if (user.PlayerInfo.Length != 0 && user.PlayerInfo != null)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Append(Convert.ToString(i + 1) + ". ");
-                sb.Append(user.PlayerInfo[i]);
-                ScrollText(Convert.ToString(sb));
+                ScrollText("\nHere is all the infomation you know. You have a max of 4 that you can hold");
+                for (int i = 0; i < user.PlayerInfo.Length; i++)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(Convert.ToString(i + 1) + ". ");
+                    sb.Append(user.PlayerInfo[i]);
+                    ScrollText(Convert.ToString(sb));
+                }
+            }
+            else
+            {
+                ScrollText("You have no infomation stored. use Trade Info to roll for infomation");
             }
         }
 
-        Info GetInfoType(string info)
+        Info GetInfoType(string info) // find and return the type of string when given a InfoAvalible or player info string
         {
             info = info.ToLower().Substring(0, 3);
 
@@ -382,7 +397,7 @@ class Program
             }
         }
 
-        string InfoGain()
+        string InfoGain() // Add info to the player randomly chosen
         {
             string item = null;
 
@@ -404,31 +419,29 @@ class Program
                 return item;
         }
 
-        void InfoTrade()
+        void InfoTrade() // start a info trade where the player an buy or roll for infomation. can only do this twice a day.
         {
-            if(currentRoom.isTradeable == true)
+            if(currentRoom.isTradeable == true )
             {
                 ScrollText("You look around for people to trade with");
 
                 bool isEnabled = false;
+                string Answer2;
 
                 InfoShow();
 
                 while(isEnabled == false)
                 {
+                    Answer2 = choice("What do you want too do \n1. Sell info \n2. Roll speach for infomation \n3. Exit", 3);
 
-                
+                    int Sell = RandomNumber(10, 30 * Convert.ToInt32(user.PlayerDiscount));
 
-                    Answer = choice("What do you want too do \n1. Sell info \n2.Roll speach for infomation \n3. Exit", 3);
-
-                    int Sell = RandomNumber(10, 30 * Convert.ToInt32(Math.Round(user.PlayerDiscount)));
-
-                    switch (Answer)
+                    switch (Answer2)
                     {
                         case "1":
-                            Answer = choice("Input the number of the info u want too sell", user.PlayerInfo.Length);
+                            Answer2 = choice("Input the number of the info u want too sell", user.PlayerInfo.Length);
 
-                            string InfoSelected = user.PlayerInfo[Convert.ToInt32(Answer)];
+                            string InfoSelected = user.PlayerInfo[Convert.ToInt32(Answer2)];
 
                             Info InfoType = GetInfoType(InfoSelected);
                             Sell += (int)InfoType;
@@ -446,10 +459,10 @@ class Program
                             break;
 
                         case "2":
-                            Answer = choice("How do you want to get your info from people? \n1. Have a conversation with someone(Charm) \n2. Threaten someone(Intimidation) \n3. Read infomation (Intellegence) \n4. Listen to others (Sneak)", 4);
+                            Answer2 = choice("How do you want to get your info from people? \n1. Have a conversation with someone(Charm) \n2. Threaten someone(Intimidation) \n3. Read infomation (Intellegence) \n4. Listen to others (Sneak)", 4);
                             bool hasWon = false;
 
-                            switch (Answer)
+                            switch (Answer2)
                             {
                                 case "1":
                                     hasWon = RollStats(user.PlayerCharisma, RandomNumber(2, 4), "Charm");
@@ -494,7 +507,8 @@ class Program
 
         void NewDay() // method for starting a new day 
         {
-            ScrollText("A new day begins, your health is restored");
+            ScrollText($"A new day begins, your health is restored to 10 and you have {AvalibleTrade} Infomation Trades");
+            AvalibleTrade = 2;
             user.PlayerHealth = 10;
             user.PlayerGold += DaylyMoney;
             ShowStats();
@@ -527,7 +541,17 @@ class Program
             ScrollText($"Your Discount level is at {user.PlayerDiscount}");
             Console.ResetColor();
 
-            ScrollText(CentrePad("------------", 4));
+            if (AvalibleTrade != 0)
+            {
+                ScrollText($"You can trade info {AvalibleTrade} more times today");
+            }
+            else
+            {
+                ScrollText("You can't Trade anymore infomation today");
+            }
+            ScrollText("You can use 'ShowInfo' to see your info inventory");
+
+                ScrollText(CentrePad("------------", 4));
 
         }
 
@@ -539,7 +563,13 @@ class Program
 
         void Continue() // fast way of waiting for the user to input before clearing the screen 
         {
-            PlayerInput("Press enter to continue");
+            string input = "";
+
+            do
+            {
+                input = PlayerInput("Press enter to continue\n> ");
+
+            } while (input != "");
             Console.Clear();
         }
 
@@ -619,6 +649,18 @@ class Program
             Thread.Sleep(1000);
         }
 
+        void ScrollTextSlow(string text) // scrolls through text giving it a nice animation
+        {
+            Console.WriteLine("");
+            for (int i = 0; i < text.Length; i++)
+            {
+                Thread.Sleep(36);
+                Console.Write(text[i]);
+
+            }
+            Thread.Sleep(1000);
+        }
+
         int RandomNumber(int min, int max)
         {
             Random random = new Random();
@@ -658,7 +700,7 @@ class Program
                     ScrollText(ask);
                     input = Console.ReadLine();
 
-                    if (input.Trim() != "" || ask.ToLower() == "press enter to continue")
+                    if (input.Trim() != "" || ask.ToLower() == "press enter to continue\n> ")
                     {
                         isEntered = true;
                     }
@@ -668,29 +710,33 @@ class Program
                     Console.WriteLine("Unexpected Value");
                 }
 
-                switch (input.Trim().ToLower()) // Check for the players input of other actions
+                if (currentLevel != Level.Intro || currentLevel != Level.Title)
                 {
-                    case "exit":
-                        Environment.Exit(0);
-                        break;
-                    case "clear":
-                        Console.Clear();
-                        break;
-                    case "showstats":
-                        ShowStats();
-                        break;
-                    case "room":
-                        ChangeRoom();
-                        break;
-                    case "show info":
-                        InfoShow();
-                        break;
-                    case "trade info":
-                        InfoTrade();
-                        break;
-                    case "help":
-                        ScrollText("Type 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Show Info' Show what infomation you have stored \nType 'Trade Info' to trade info if avalible \nType 'Exit' to exit the game\n");
-                        break;
+
+                    switch (input.Trim().ToLower()) // Check for the players input of other actions
+                    {
+                        case "exit":
+                            Environment.Exit(0);
+                            break;
+                        case "clear":
+                            Console.Clear();
+                            break;
+                        case "showstats":
+                            ShowStats();
+                            break;
+                        case "room":
+                            ScrollText(currentRoom.Description);
+                            break;
+                        case "show info":
+                            InfoShow();
+                            break;
+                        case "trade info":
+                            InfoTrade();
+                            break;
+                        case "help":
+                            ScrollText("You get 2 Trade info per day, You can get daily gold by getiing a job \nType 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Show Info' Show what infomation you have stored \nType 'Trade Info' to trade info if avalible \nType 'Exit' to exit the game\n");
+                            break;
+                    }
                 }
 
             } while (isEntered == false || input == null);

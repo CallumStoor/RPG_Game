@@ -19,7 +19,7 @@ public class Player
     public double PlayerDiscount;
 
     // Player InfoList
-    public string[] PlayerInfo;
+    public string[] PlayerInfo = { "Dracones are looking for someone" };
 
     public Player(string playerName, int playerHealth, int playerIntellegence, int playerIntimidaton, int playerCharisma, int playerSneak, int playerGold)
     {
@@ -37,7 +37,8 @@ public class Player
     {
 
         int highestStat = Math.Max(PlayerCharisma, PlayerIntimidation);
-        PlayerDiscount = highestStat * 0.4f;
+        PlayerDiscount = highestStat * 0.5f;
+        PlayerDiscount = Math.Round(PlayerDiscount);
 
         Stat += 1;
         Console.ForegroundColor = ConsoleColor.Blue;
