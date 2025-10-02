@@ -517,7 +517,7 @@ class Program
         string PlayerInput(string ask) // return what the player inputs while stopping any errors until expected value appears. 
         {
             bool isEntered = false;
-            string input = "a";
+            string input = "";
 
             do
             {
@@ -526,7 +526,7 @@ class Program
                     ScrollText(ask);
                     input = Console.ReadLine();
 
-                    if (input.Trim() != "" && ask != "Press enter to continue")
+                    if (input.Trim() != "" || ask.ToLower() == "press enter to continue")
                     {
                         isEntered = true;
                     }
