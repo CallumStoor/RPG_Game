@@ -28,12 +28,14 @@ class Program
         Room street = new Room("Street",
             "You are standing on a busy street, it smells and everyone is moving past you with somewhere to go.",
             "The people look at you with disgust",
-            AsciiImage.AsciiDisplay(""));
+            AsciiImage.AsciiDisplay(""),
+            true);
 
         Room shop = new Room("Shop",
             "You are in a small shop, there is a shopkeep behind the counter eyeing you suspiciously",
             "You enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.",
-            AsciiImage.AsciiDisplay("ShopSign"));
+            AsciiImage.AsciiDisplay("ShopSign"),
+            true);
 
         // current room the player is in
         Room currentRoom = street;
@@ -49,6 +51,7 @@ class Program
         string Answer = "";
         int DaylyMoney = 0;
         Level currentLevel = Level.Title;
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true); // unused 
 
         // game starts here
 
@@ -66,7 +69,7 @@ class Program
             Level02();
         }
 
-        AliveCheck(); // just in case
+        AliveCheck(); // check if at end of game alive
 
         Console.ReadLine();
 
@@ -82,7 +85,7 @@ class Program
             {
                 case "1":
                     ScrollText("Starting New Game");
-                    newGame = true;
+                    newGame = true; // in main allows game to run in order
                     break;
                 case "2":
                     ScrollText("Starting at Level 1");
@@ -304,6 +307,45 @@ class Program
             return currentRoom.Name;
         }
 
+        void InfoShow()
+        {
+            ScrollText(CentrePad("Infomation Inventory", 3));
+            ScrollText("\nHere is all the infomation you know.");
+            foreach(string i in user.PlayerInfo)
+            {
+                ScrollText(i);
+            }
+        }
+
+        void InfoTrade()
+        {
+            if(currentRoom.isTradeable == true)
+            {
+                ScrollText("You look around for people to trade with");
+
+                if(user.PlayerInfo != null)
+                {
+                    InfoShow();
+                }
+                else if(user.PlayerGold != 0)
+                {
+                    ScrollText($"You have {user.PlayerGold} gold to trade");
+                }
+                else
+                {
+                    ScrollText("You have nothing to trade...");
+                }
+
+            }
+            else
+            {
+                ScrollText("You can't trade here");
+            }
+
+
+            ScrollText("You stop trading");
+        }
+
         void NewDay() // method for starting a new day 
         {
             ScrollText("A new day begins, your health is restored");
@@ -332,8 +374,8 @@ class Program
             string PlayerText = $"{user.PlayerName} Stats";
 
             ScrollText(CentrePad(PlayerText, 4));
-            ScrollText(CentrePad($"Level {currentLevel}", 1));
-            ScrollText($"You are on Level {currentLevel} \n");
+            ScrollText(CentrePad($"Player Level {currentLevel}", 1));
+            ScrollText($"You are on Day {currentLevel} \n");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ScrollText($"You have {user.PlayerHealth}HP left.");
@@ -346,7 +388,11 @@ class Program
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             ScrollText($"You have {user.PlayerGold} Gold");
+
+            if(DaylyMoney != 0)
+            {
             ScrollText($"You get {DaylyMoney}Gold everyday");
+            }
             Console.ResetColor();
 
             ScrollText(CentrePad("------------", 4));
@@ -378,7 +424,9 @@ class Program
             {
 
                 Console.Clear();
-                ScrollText("\nYOU HAVE BEEN CAUGHT\n");
+                ScrollText("\nYOU HAVE BEEN CAUGHT\n\nYour stats were");
+
+                ShowStats();
                 Console.ReadLine();
                 Environment.Exit(0);
 

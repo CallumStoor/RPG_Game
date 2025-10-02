@@ -9,18 +9,20 @@ class Room
     public int EnergyUsed = 0;
 
     public bool isVisited = false;
+    public bool isTradeable;
 
     public Room NorthDoor;
     public Room SouthDoor;
     public Room EastDoor;
     public Room WestDoor;
 
-    public Room(string name, string description, string firstVisit, string asciiText)
+    public Room(string name, string description, string firstVisit, string asciiText, bool istradable)
     {
         Name = name;
         Description = description;
         FirstVisitDescription = firstVisit;
         AsciiText = asciiText;
+        isTradeable = istradable;
         
     }
 

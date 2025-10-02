@@ -11,6 +11,7 @@ public class Player
     public int PlayerSneak = 1;
     public int PlayerGold = 1;
     public string PlayerName = "Dweller";
+    public string[] PlayerInfo;
 
     public Player(string playerName, int playerHealth, int playerIntellegence, int playerIntimidaton, int playerCharisma, int playerSneak, int playerGold)
     {
