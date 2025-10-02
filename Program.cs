@@ -1,10 +1,13 @@
 ﻿using RPG_Game;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.CompilerServices;
 
 class Program
 {
@@ -17,6 +20,13 @@ class Program
         _02
     }
 
+    enum Info
+    {
+        People = 1,
+        Country,
+        Dracones
+    }
+
     public static void Main(string[] args)
     {
         // starting stats of the player at the begining of the game
@@ -27,13 +37,11 @@ class Program
         // rooms in the game
         Room street = new Room("Street",
             "You are standing on a busy street, it smells and everyone is moving past you with somewhere to go.",
-            "The people look at you with disgust",
             AsciiImage.AsciiDisplay(""),
             true);
 
         Room shop = new Room("Shop",
             "You are in a small shop, there is a shopkeep behind the counter eyeing you suspiciously",
-            "You enter the shop and look around, you still have no money... \nYou walk over to the man behind the till and wait in the long line \nWhen you finally reach the man he greets you with a disapointed face, probably becuase you look like a street begger\n\n 'Get out of here I won't give you anything' \n 'No wait' you exclaim 'I need a job!' \n 'Come back another time you aren't the only one' \n\nYou leave the store and look at the setting sun.",
             AsciiImage.AsciiDisplay("ShopSign"),
             true);
 
@@ -51,7 +59,20 @@ class Program
         string Answer = "";
         int DaylyMoney = 0;
         Level currentLevel = Level.Title;
-        ConsoleKeyInfo keyInfo = Console.ReadKey(true); // unused 
+
+        // Infomation List
+
+        string[] InfoAvalible = 
+            {
+            "Dracones boss name is John", 
+            "Dracones pay off the Goverment",
+            "Country has a small rebelian starting again", 
+            "Country and it's people are poor",
+            "Country has an escape near the east sea",
+            "People are getting restless under the rule of Dracones",
+            "People fear talk of a new weapon",
+            "People are running underground trades without tax from Dracones"
+            };
 
         // game starts here
 
@@ -104,7 +125,7 @@ class Program
         {
             currentLevel = Level.Intro;
             Console.Clear();
-            ScrollText($"Welcome! {user.PlayerName}");
+            ScrollText($"Welcome {user.PlayerName}!");
 
             //show image
             Console.WriteLine(AsciiImage.AsciiDisplay("Village"));
@@ -119,13 +140,20 @@ class Program
             ScrollText("In the bustling town of dercher, The dracones are hot on your tail and it's your fault. jumping into a wagon stationed near-by the wagon then darts off as fast as it can weaving between people and Dracone members");
             Console.WriteLine();
             Thread.Sleep(300);
-            ScrollText($"Hey {user.PlayerName} what the hell, you said they would be long gone before you got here \n\nIt's fine they don't even know who you are. \n\nDid you foget who we are talking about, even if they couldn't easily find out I would have to change my wagon before they get a full profile on it. every single detail! \n\nWell we got away didn't we? \nNo thanks to you \n\nOh just drop it already. ");
+            ScrollText($"Hey {user.PlayerName} what the hell, you said they would be long gone before you got here \n\nIt's fine they don't even know who you are. \n\nDid you foget who we are talking about, even if they couldn't easily find out I would have to change my wagon before they get a full profile on it. every single detail! \n\nWell we got away didn't we? \n\nNo thanks to you \n\nOh just drop it already. ");
 
             Continue();
 
             ScrollText(CentrePad("A few hours later", 4));
             Console.WriteLine();
-            ScrollText("You have made it to the next town over and he stops the wagon\nSo how about that payment, i know we agreed until we are long gone but after what you done back there i deserve something. \n Soo.. about that. i actually got to go, i know crazy right? anyawy. See ya\nWHAT YOU CAN'T DO THAT");
+            ScrollText("You have made it to the next town over and he stops the wagon\n\nHow about that payment, i know we agreed until we are long gone but after what you done back there i deserve something. \n");
+            Thread.Sleep(500);
+            ScrollText("...");
+            Thread.Sleep(500);
+            ScrollText("Soo.. about that. I actually got to go, i know crazy right? anyawy. See ya!\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            ScrollText("WHAT YOU CAN'T DO THAT, GET BACK HERE YOU BLITHERING BASTARD");
+            Console.ResetColor();
 
         }
 
@@ -166,13 +194,15 @@ class Program
 
             ScrollText("Where will you go?");
 
-            Answer = choice("1. Enter the closest shop you can find \n2. Practice your talking skills with other people (talk) \n3. Try to steal some food for the day (sneak)", 3);
+            Answer = choice("1. Look for places to go \n2. Practice your talking skills with other people (talk) \n3. Try to steal some food for the day (sneak)", 3);
 
             switch (Answer)
             {
                 case "1":
-                    currentRoom = shop;
-                    currentRoom.Visit();
+                    ChangeRoom();
+                    ScrollText("You are now in the Shop, the shopkeeper doesn't look too fond of that fact, probably because you look like a begger.");
+
+                    Answer = choice("What do you want to do? \n1. Look for places to go \n2. Trade for infomation \n3. Talk to the shopkeep (talk)", 2);
                     break;
                 case "2":
                     ScrollText("\n You walk up to the first normal-ish looking person you can find and chat with them \n they don't reply much but you make them smile a small amount\n you realise it has gotten late.");
@@ -207,13 +237,12 @@ class Program
 
             ScrollText("Where will you go now?");
 
-            Answer = choice("1. Go to the shop \n2. Try to find a job (charisma) \n3. Try to steal something (sneak)", 3);
+            Answer = choice("1. Look around for places to go \n2. Try to find a job (charisma) \n3. Try to steal something (sneak)", 3);
 
             switch (Answer)
             {
                 case "1":
-                    currentRoom = shop;
-                    DescribeRoom(currentRoom);
+                    ChangeRoom();
                     break;
                 case "2":
                     ScrollText("You try to find a job");
@@ -254,8 +283,18 @@ class Program
         //method to change rooms
         string ChangeRoom()
         {
-            currentRoom = street; // starting room 
-            DescribeRoom(currentRoom);
+            ScrollText($"\nYou are in the {currentRoom.Name}.\n{currentRoom.Description}\n");
+
+            Console.WriteLine(AsciiImage.AsciiDisplay(currentRoom.AsciiText));
+
+            Console.WriteLine(@"
+    Room Exits: {0}{1}{2}{3}",
+            currentRoom.NorthDoor == null ? "" : $"1. {currentRoom.NorthDoor.Name} Door",
+            currentRoom.SouthDoor == null ? "" : $"2. {currentRoom.SouthDoor.Name} Door",
+            currentRoom.EastDoor == null ? "" : $"3. {currentRoom.EastDoor.Name} Door",
+            currentRoom.WestDoor == null ? "" : $"4. {currentRoom.WestDoor.Name} Door"
+            );
+
             string Answer = choice("Where do you want to go?", 4);
             switch (Answer)
             {
@@ -274,7 +313,7 @@ class Program
                     if (currentRoom.SouthDoor != null)
                     {
                         currentRoom = currentRoom.SouthDoor;
-                        DescribeRoom(currentRoom);
+                        currentRoom.Visit();
                     }
                     else
                     {
@@ -285,7 +324,7 @@ class Program
                     if (currentRoom.EastDoor != null)
                     {
                         currentRoom = currentRoom.EastDoor;
-                        DescribeRoom(currentRoom);
+                        currentRoom.Visit();
                     }
                     else
                     {
@@ -296,7 +335,7 @@ class Program
                     if (currentRoom.WestDoor != null)
                     {
                         currentRoom = currentRoom.WestDoor;
-                        DescribeRoom(currentRoom);
+                        currentRoom.Visit();
                     }
                     else
                     {
@@ -310,11 +349,59 @@ class Program
         void InfoShow()
         {
             ScrollText(CentrePad("Infomation Inventory", 3));
-            ScrollText("\nHere is all the infomation you know.");
-            foreach(string i in user.PlayerInfo)
+            ScrollText("\nHere is all the infomation you know. You have a max of 4 that you can hold");
+            for (int i = 0; i < user.PlayerInfo.Length; i++)
             {
-                ScrollText(i);
+                StringBuilder sb = new StringBuilder();
+                sb.Append(Convert.ToString(i + 1) + ". ");
+                sb.Append(user.PlayerInfo[i]);
+                ScrollText(Convert.ToString(sb));
             }
+        }
+
+        Info GetInfoType(string info)
+        {
+            info = info.ToLower().Substring(0, 3);
+
+            if (info == "dra")
+            {
+                return Info.Dracones;
+            }
+            else if(info == "cou")
+            {
+                return Info.Country;
+            }
+            else if(info == "peo")
+            {
+                return Info.People;
+            }
+            else
+            {
+                ScrollText("Info Type doesn't exist");
+                return 0;
+            }
+        }
+
+        string InfoGain()
+        {
+            string item = null;
+
+            int InfoIndex = RandomNumber(0, InfoAvalible.Length);
+            if (InfoAvalible != null && user.PlayerInfo.Length < 5)
+            {
+                item = Convert.ToString(user.PlayerInfo.Append(InfoAvalible[InfoIndex]));
+                // Remove the item from InfoAvalible list
+            }
+            else if(user.PlayerInfo.Length > 4)
+            {
+                ScrollText("You already have the max amount of stored info");
+            }
+            else
+            {
+                ScrollText("You already have everything");
+            }
+
+                return item;
         }
 
         void InfoTrade()
@@ -323,25 +410,84 @@ class Program
             {
                 ScrollText("You look around for people to trade with");
 
-                if(user.PlayerInfo != null)
-                {
-                    InfoShow();
-                }
-                else if(user.PlayerGold != 0)
-                {
-                    ScrollText($"You have {user.PlayerGold} gold to trade");
-                }
-                else
-                {
-                    ScrollText("You have nothing to trade...");
-                }
+                bool isEnabled = false;
 
+                InfoShow();
+
+                while(isEnabled == false)
+                {
+
+                
+
+                    Answer = choice("What do you want too do \n1. Sell info \n2.Roll speach for infomation \n3. Exit", 3);
+
+                    int Sell = RandomNumber(10, 30 * Convert.ToInt32(Math.Round(user.PlayerDiscount)));
+
+                    switch (Answer)
+                    {
+                        case "1":
+                            Answer = choice("Input the number of the info u want too sell", user.PlayerInfo.Length);
+
+                            string InfoSelected = user.PlayerInfo[Convert.ToInt32(Answer)];
+
+                            Info InfoType = GetInfoType(InfoSelected);
+                            Sell += (int)InfoType;
+
+                            ScrollText($"You are selling the {InfoSelected} for {Sell} Gold");
+
+                            string confirm = PlayerInput("Yes or no?");
+                            confirm = confirm.ToLower().Trim().Substring(0, 1);
+
+                            if (confirm == "y")
+                            {
+                                ScrollText("Infomation Sold!");
+                                user.PlayerGold += Sell;
+                            }
+                            break;
+
+                        case "2":
+                            Answer = choice("How do you want to get your info from people? \n1. Have a conversation with someone(Charm) \n2. Threaten someone(Intimidation) \n3. Read infomation (Intellegence) \n4. Listen to others (Sneak)", 4);
+                            bool hasWon = false;
+
+                            switch (Answer)
+                            {
+                                case "1":
+                                    hasWon = RollStats(user.PlayerCharisma, RandomNumber(2, 4), "Charm");
+                                    break;
+
+                                case "2":
+                                    hasWon = RollStats(user.PlayerIntimidation, RandomNumber(2, 4), "Intimidation");
+                                    break;
+
+                                case "3":
+                                    hasWon = RollStats(user.PlayerIntellegence, RandomNumber(2, 4), "Intellegence");
+                                    break;
+
+                                case "4":
+                                    hasWon = RollStats(user.PlayerSneak, RandomNumber(2, 4), "Sneak");
+                                    break;
+
+                            }
+
+                        if (hasWon)
+                        {
+                            InfoGain();
+                        }
+                        break;
+
+
+
+                    default:
+                        ScrollText("You exit");
+                        break;
+
+                    }
+                }
             }
             else
             {
-                ScrollText("You can't trade here");
+                ScrollText("You have nothing to trade...");
             }
-
 
             ScrollText("You stop trading");
         }
@@ -354,28 +500,12 @@ class Program
             ShowStats();
         }
 
-        void DescribeRoom(Room room) // describes the room the player is in 
-        {
-            ScrollText($"\nYou are now in the {room.Name}.\n{room.Description}\n");
-
-            Console.WriteLine(AsciiImage.AsciiDisplay(room.AsciiText));
-
-            Console.WriteLine(@"
-    Room Exits: {0}{1}{2}{3}",
-            room.NorthDoor == null ? "" : "1. North",
-            room.SouthDoor == null ? "" : "2. South",
-            room.EastDoor == null ? "" : "3. East",
-            room.WestDoor == null ? "" : "4. West"
-            );
-        }
 
         void ShowStats() // shows the players stats when called
         {
-            string PlayerText = $"{user.PlayerName} Stats";
 
-            ScrollText(CentrePad(PlayerText, 4));
-            ScrollText(CentrePad($"Player Level {currentLevel}", 1));
-            ScrollText($"You are on Day {currentLevel} \n");
+            ScrollText(CentrePad($"{user.PlayerName}'s Stats", 4));
+            ScrollText(CentrePad($"You are in Level {currentLevel}", 1));
 
             Console.ForegroundColor = ConsoleColor.Green;
             ScrollText($"You have {user.PlayerHealth}HP left.");
@@ -393,6 +523,8 @@ class Program
             {
             ScrollText($"You get {DaylyMoney}Gold everyday");
             }
+
+            ScrollText($"Your Discount level is at {user.PlayerDiscount}");
             Console.ResetColor();
 
             ScrollText(CentrePad("------------", 4));
@@ -550,8 +682,14 @@ class Program
                     case "room":
                         ChangeRoom();
                         break;
+                    case "show info":
+                        InfoShow();
+                        break;
+                    case "trade info":
+                        InfoTrade();
+                        break;
                     case "help":
-                        ScrollText("Type 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Exit' to exit the game\n");
+                        ScrollText("Type 'Show Stats' to see your stats \nType 'Room' to see your current room \nType 'Clear' to clear the screen \nType 'Show Info' Show what infomation you have stored \nType 'Trade Info' to trade info if avalible \nType 'Exit' to exit the game\n");
                         break;
                 }
 
