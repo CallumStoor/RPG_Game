@@ -316,7 +316,7 @@ class Program
         {
             ScrollText($"\nYou are now in the {room.Name}.\n{room.Description}\n");
 
-            Console.WriteLine(AsciiImage.AsciiDisplay("ShopSign"));
+            Console.WriteLine(AsciiImage.AsciiDisplay(room.AsciiText));
 
             Console.WriteLine(@"
     Room Exits: {0}{1}{2}{3}",
@@ -395,17 +395,21 @@ class Program
 
             Console.ForegroundColor = ConsoleColor.Blue;
             ScrollText($"\nYou used {Type}");
+
             ScrollText($"Your {Type} Level is {PlayerStat}");
+
             Console.ForegroundColor = ConsoleColor.DarkRed;
             ScrollText($"They have a Level of {RanNum}");
+
             Console.ForegroundColor = ConsoleColor.Yellow;
-            for (int i = 0; i < 3; i++)
+
+            for (int i = 0; i < 3; i++) // add a wait before showing the result
             {
                 Thread.Sleep(500);
                 Console.Write(" .");
             }
 
-            if (PlayerStat >= RanNum)
+            if (PlayerStat >= RanNum) // check who won the roll and display the result
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 ScrollText("You Won Roll\n");
@@ -485,7 +489,7 @@ class Program
                     Console.WriteLine("Unexpected Value");
                 }
 
-                switch (input.Trim().ToLower())
+                switch (input.Trim().ToLower()) // Check for the players input of other actions
                 {
                     case "exit":
                         Environment.Exit(0);
