@@ -78,7 +78,7 @@ class Program
             user.PlayerName = PlayerInput("What is your name: ");
 
             ScrollText("Type 'help' to see game comands\n");
-            ScrollText(CentrePad("Welcome to Bog Dewller", 2));
+            ScrollText(CentrePad("Welcome to Swamp Dewller", 2));
 
             Answer = choice("What level do you want to start at? \n1. Start New Game \n2. Level 1\n3. Level 2", 3);
             switch (Answer)
