@@ -113,9 +113,16 @@ class Program
             Continue();
 
             Console.Clear();
-            Console.WriteLine("Intro to game here");
-
+            ScrollText("In the bustling town of dercher, The dracones are hot on your tail and it's your fault. jumping into a wagon stationed near-by the wagon then darts off as fast as it can weaving between people and Dracone members");
+            Console.WriteLine();
+            Thread.Sleep(300);
+            ScrollText($"Hey {user.PlayerName} what the hell, you said you would be long gone before you got in here \nIt's fine they don't even know who you are. \nDid you foget who we are talking about, even if they couldn't easily find out i would have to change my wagon before they get a full profile on it. every single detail! \nWell we got away didn't we? \nNo thanks to you \n Oh just drop it already. ");
+            
             Continue();
+
+            ScrollText(CentrePad("A few hours later", 4));
+            Console.WriteLine();
+            ScrollText("You have made it to the next town over and he stops the wagon\nSo how about that payment, i know we agreed until we are long gone but after what you done back there i deserve something. \n Soo.. about that. i actually got to go, i know crazy right? anyawy. See ya\nWHAT YOU CAN'T DO THAT");
 
         }
 
