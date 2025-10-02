@@ -407,8 +407,7 @@ class Program
 
         void Continue() // fast way of waiting for the user to input before clearing the screen 
         {
-            ScrollText("Press Enter To Continue");
-            Console.ReadLine();
+            PlayerInput("Press enter to continue");
             Console.Clear();
         }
 
@@ -527,7 +526,7 @@ class Program
                     ScrollText(ask);
                     input = Console.ReadLine();
 
-                    if (input.Trim() != "")
+                    if (input.Trim() != "" && ask != "Press enter to continue")
                     {
                         isEntered = true;
                     }
