@@ -140,28 +140,28 @@ class Program
             Continue();
 
             Console.Clear();
-            ScrollTextSlow("In the bustling town of dercher, The dracones are hot on your tail and it's your fault. Jumping into a wagon stationed nearby the wagon then darts off as fast as it can weaving between people and Dracone members");
+            ScrollTextSlow("In the bustling town of dercher, The dracones are hot on your tail and you just tried to take out their leader. Jumping into a wagon stationed nearby the wagon then darts off as fast as it can weaving between people and Dracone members");
             Console.WriteLine();
             Thread.Sleep(300);
-            ScrollTextSlow($"'Hey {user.PlayerName}..'");
-            ScrollTextSlow("'Yeah?'");
-            ScrollTextSlow("'What the hell! You said they would be long gone before you got here' \n\n'It's fine they don't even know who you are.' \n\n'Did you foget who we are talking about, even if they couldn't easily find out I would have to change my wagon before they get a full profile on it. every single detail!' \n\n'Well we got away didn't we?' \n\n'No thanks to you' \n\n'Oh just drop it already.' ");
-            ScrollTextSlow("'Why are you acting like this wasn't the worst mistake of your life?! At least he is dead now'");
-            ScrollTextSlow("'Yeah.. sure..'");
+            ScrollTextSlow($"Driver: 'Hey {user.PlayerName}..'\n");
+            ScrollTextSlow("You: 'Yeah?'\n");
+            ScrollTextSlow("Driver: 'What the hell! You said they would be long gone before you got here' \n\nYou: 'It's fine they don't even know who you are.' \n\nDriver: 'Did you foget who we are talking about, even if they couldn't easily find out who i am. They will stop every single wagon, in every town anywhere remotly close looking for you.' \n\n'Well we got away didn't we?' \n\nDriver: 'No thanks to you' \n\n'Oh just drop it already.' ");
+            ScrollTextSlow("\nDriver: 'Why are you acting like this wasn't the worst mistake of your life?! At least Dracone is dead now.'");
+            ScrollTextSlow("You: 'Yeah.. sure...'");
             ScrollTextSlow($"The driver's eyes narrow and glance at {user.PlayerName} for a second\n");
             Continue();
 
             ScrollTextSlow(CentrePad("A few hours later", 4));
             Console.WriteLine();
-            ScrollTextSlow("'You have made it to the next town over and he stops the wagon'\n\n'How about that payment, i know we agreed until we are long gone but after what you done back there i deserve something.' \n");
+            ScrollTextSlow("You have made it to the next town over and he stops the wagon\n\nDriver: 'How about that payment, i know we agreed until we are long gone, but after what you done back there i deserve something.' \n");
             Thread.Sleep(500);
-            ScrollTextSlow("...\n");
+            ScrollTextSlow("You: '...'\n");
             Thread.Sleep(500);
-            ScrollTextSlow("'So about that. I actually got to go, i know crazy right? Anyawy. See ya!'\n");
+            ScrollTextSlow("You: 'So about that. I actually got to go, i know crazy right? Anyawy. See ya!'\n");
             Console.ForegroundColor = ConsoleColor.Red;
-            ScrollTextSlow("'WHAT YOU CAN'T DO THAT, GET BACK HERE YOU BLITHERING BASTARD!'\n");
+            ScrollTextSlow("Driver: 'WHAT YOU CAN'T DO THAT, GET BACK HERE YOU BLITHERING BASTARD!'\n");
             Console.ResetColor();
-            Thread.Sleep(200);
+            Continue();
 
         }
 
@@ -198,7 +198,8 @@ class Program
 
             ScrollText("You made it away");
 
-            ScrollText("You make your way into the centre of the town, people are everywhere");
+            ScrollText("You wear a long cloak to hide your face from people passing by and blend in with the poor");
+            AsciiImage.AsciiDisplay("Player");
 
             ScrollText("Where will you go?");
 
@@ -213,10 +214,12 @@ class Program
                     Answer = choice("What do you want to do? \n1. Look for places to go \n2. Trade for infomation \n3. Talk to the shopkeep (talk)", 2);
                     break;
                 case "2":
+                    Console.WriteLine(AsciiImage.AsciiDisplay("Homeless"));
                     ScrollText("\n You walk up to the first normal-ish looking person you can find and chat with them \n they don't reply much but you make them smile a small amount\n you realise it has gotten late.");
                     user.PlayerCharisma = user.StatIncrease(user.PlayerCharisma, "Charm");
                     break;
                 case "3":
+                    Console.WriteLine(AsciiImage.AsciiDisplay("FoodStand"));
                     ScrollText("\nYou walk over too a food stand and wait until it gets busy, then try to steal a loaf of bread");
                     RollStats(user.PlayerSneak, 4, "Sneak");
                     ScrollText("The Shopkeep shouts at you and goes to call over the law enforcemnt.. \nYou need to run\n Running through crowds of people makes you tired and once you get away they leave. \nYou lose 3 health for that");
@@ -238,7 +241,7 @@ class Program
             currentLevel = Level._02;
 
             Console.Clear();
-            ScrollText("Today is a new day and you sleept... ");
+            ScrollText("Today is a new day and you slept... ");
             ScrollText("well you slept so thats all that counts right?");
             NewDay();
 
@@ -267,8 +270,9 @@ class Program
                     }
                     break;
                 case "3":
+                    Ascii.WriteLine(AsciiImage.AsciiDisplay("FoodStand"));
                     ScrollText("You try to steal something");
-                    if (RollStats(user.PlayerSneak, 4, "Sneak"))
+                    if (RollStats(user.PlayerSneak, 4, "Sneak") == true)
                     {
                         ScrollText("You got away with it!");
                         user.PlayerSneak = user.StatIncrease(user.PlayerSneak, "Sneak");
@@ -284,6 +288,8 @@ class Program
 
                     break;
             }
+
+            ScrollText("\nYou have to sleep on the street again tonight\n");
 
             Continue();
         }
@@ -372,7 +378,7 @@ class Program
             }
             else
             {
-                ScrollText("You have no infomation stored. use Trade Info to roll for infomation");
+                ScrollText(CentrePad("Infomation Inventory".Length, 3) + "\n");
             }
         }
 
@@ -572,7 +578,10 @@ class Program
             {
                 ScrollText("You can't Trade anymore infomation today");
             }
-            ScrollText("You can use 'ShowInfo' to see your info inventory");
+            ScrollText($"You have {user.PlayerInfo.Length} Peices of info stored")
+            ScrollText("You can use 'Show Info' to see your info inventory");
+
+            ScrollText("To gain info you can use 'Trade Info' whenever you aren't busy doing something")
 
                 ScrollText(CentrePad("------------", 4));
 
@@ -635,11 +644,15 @@ class Program
 
             Console.ForegroundColor = ConsoleColor.Yellow;
 
+            AsciiImage.AsciiDisplay("Dice");
+
             for (int i = 0; i < 3; i++) // add a wait before showing the result
             {
                 Thread.Sleep(500);
                 Console.Write(" .");
             }
+
+            ScrollText($"You rolled {PlayerStat} and they rolled {RanNum}")
 
             if (PlayerStat >= RanNum) // check who won the roll and display the result
             {

@@ -48,6 +48,7 @@ public class Player
         Console.ResetColor();
 
         ScrollText($"Your Discount Stat is {highestStat}");
+        PlayerDiscount = highestStat;
 
         return Stat;
     }
