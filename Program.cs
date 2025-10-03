@@ -357,7 +357,7 @@ class Program
         void InfoShow()
         {
             ScrollText(CentrePad("Infomation Inventory", 3));
-            if (user.PlayerInfo.Length != 0 && user.PlayerInfo != null)
+            if (user.PlayerInfo != null && user.PlayerInfo.Length != 0)
             {
                 ScrollText("\nHere is all the infomation you know. You have a max of 4 that you can hold");
                 for (int i = 0; i < user.PlayerInfo.Length; i++)
@@ -367,6 +367,8 @@ class Program
                     sb.Append(user.PlayerInfo[i]);
                     ScrollText(Convert.ToString(sb));
                 }
+                Console.WriteLine();
+                ScrollText("That is everything you know right now.");
             }
             else
             {
@@ -404,8 +406,14 @@ class Program
             int InfoIndex = RandomNumber(0, InfoAvalible.Length);
             if (InfoAvalible != null && user.PlayerInfo.Length < 5)
             {
-                item = Convert.ToString(user.PlayerInfo.Append(InfoAvalible[InfoIndex]));
-                // Remove the item from InfoAvalible list
+                string[] newInfo = new string[user.PlayerInfo.Length + 1];
+                for (int i = 0; i < user.PlayerInfo.Length; i++)
+                {
+                    newInfo[i] = user.PlayerInfo[i];
+                }
+                newInfo[user.PlayerInfo.Length] = InfoAvalible[InfoIndex];
+                user.PlayerInfo = newInfo;
+                item = InfoAvalible[InfoIndex];
             }
             else if(user.PlayerInfo.Length > 4)
             {
@@ -434,21 +442,21 @@ class Program
                 {
                     Answer2 = choice("What do you want too do \n1. Sell info \n2. Roll speach for infomation \n3. Exit", 3);
 
-                    int Sell = RandomNumber(10, 30 * Convert.ToInt32(user.PlayerDiscount));
+                    int Sell = RandomNumber(10, 30 * Convert.ToInt32(user.PlayerDiscount) + 10);
 
                     switch (Answer2)
                     {
                         case "1":
                             Answer2 = choice("Input the number of the info u want too sell", user.PlayerInfo.Length);
 
-                            string InfoSelected = user.PlayerInfo[Convert.ToInt32(Answer2)];
+                            string InfoSelected = user.PlayerInfo[Convert.ToInt32(Answer2) - 1];
 
                             Info InfoType = GetInfoType(InfoSelected);
                             Sell += (int)InfoType;
 
                             ScrollText($"You are selling the {InfoSelected} for {Sell} Gold");
 
-                            string confirm = PlayerInput("Yes or no?");
+                            string confirm = PlayerInput("Yes or no? \n >");
                             confirm = confirm.ToLower().Trim().Substring(0, 1);
 
                             if (confirm == "y")
@@ -512,6 +520,21 @@ class Program
             user.PlayerHealth = 10;
             user.PlayerGold += DaylyMoney;
             ShowStats();
+        }
+
+        void ExitGame() // exit the game
+        {
+            string confirm = PlayerInput("Yes or no? \n >");
+            confirm = confirm.ToLower().Trim().Substring(0, 1);
+
+            if (confirm == "y")
+            {
+                ScrollText("Exiting game");
+
+                Continue();
+
+                Environment.Exit(0);
+            }
         }
 
 
@@ -592,7 +615,7 @@ class Program
                 Environment.Exit(0);
 
             }
-            return true;
+            return isAlive;
 
         }
 
@@ -670,19 +693,68 @@ class Program
         string choice(string Question, int Max) // asks a question and returns a number between 1 and the max value based on user input
         {
             int Answer = -1;
+            string input = "";
 
             do
             {
                 try
                 {
-                    Answer = Convert.ToInt32(PlayerInput(Question + "\n> "));
+                    ScrollText(Question + "\n");
+                    Console.Write("> ");
+                    input = Console.ReadLine().Trim().ToLower();
                 }
                 catch
                 {
                     Console.Write("Input a number\n");
                 }
 
-            } while (Answer < 0 || Answer > Max);
+                switch (input)
+                {
+                    case "exit":
+                        ExitGame();
+                        break;
+                    case "clear":
+                        Console.Clear();
+                        continue; // re-ask the same question
+                    case "show stats":
+                        ShowStats();
+                        continue;
+                    case "room":
+                        ScrollText(currentRoom.Description);
+                        continue;
+                    case "show info":
+                        InfoShow();
+                        continue;
+                    case "trade info":
+                        InfoTrade();
+                        continue;
+                    case "help":
+                        ScrollText("You get 2 Trade info per day... etc...");
+                        continue;
+                }
+
+                try
+                {
+                    Answer = Convert.ToInt32(input);
+                }
+                catch
+                {
+                    Console.WriteLine("Input a number");
+                    continue;
+                }
+
+
+                if (Answer >= 1 && Answer <= Max)
+                {
+                    return Answer.ToString();
+                }
+                else
+                {
+                    Console.WriteLine("Input a number between 1 and " + Max);
+                }
+
+
+            } while (true);
 
             return Convert.ToString(Answer);
 
@@ -710,18 +782,18 @@ class Program
                     Console.WriteLine("Unexpected Value");
                 }
 
-                if (currentLevel != Level.Intro || currentLevel != Level.Title)
+                if (currentLevel != Level.Intro && currentLevel != Level.Title)
                 {
 
                     switch (input.Trim().ToLower()) // Check for the players input of other actions
                     {
                         case "exit":
-                            Environment.Exit(0);
+                            ExitGame();
                             break;
                         case "clear":
                             Console.Clear();
                             break;
-                        case "showstats":
+                        case "show stats":
                             ShowStats();
                             break;
                         case "room":
